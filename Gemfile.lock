@@ -84,6 +84,7 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.1.0)
       racc
+    bson (5.1.1)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -155,6 +156,13 @@ GEM
     matrix (0.4.3)
     mini_mime (1.1.5)
     minitest (5.25.5)
+    mongo (2.21.2)
+      base64
+      bson (>= 4.14.1, < 6.0.0)
+    mongoid (9.0.7)
+      activemodel (>= 5.1, < 8.1, != 7.0.0)
+      concurrent-ruby (>= 1.0.5, < 2.0)
+      mongo (>= 2.18.0, < 3.0.0)
     msgpack (1.8.0)
     mutex_m (0.3.0)
     net-imap (0.5.9)
@@ -379,6 +387,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  mongoid
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
