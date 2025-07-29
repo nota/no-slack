@@ -26,3 +26,11 @@ console.log('Visit the guide for more information: ', 'https://vite-ruby.netlify
 
 // Example: Import a stylesheet in app/frontend/index.css
 // import '~/index.css'
+
+// https://react.dev/learn/add-react-to-an-existing-project#step-1-set-up-a-modular-javascript-environment
+import React from 'react';
+import { createRoot, createElement } from 'react-dom/client';
+import App from '../components/App';
+document.body.innerHTML = '<div id="app"></div>';
+const root = createRoot(document.getElementById('app'));
+root.render(React.createElement(App));
