@@ -12,6 +12,8 @@ services:
     command: ['bundle', 'exec', 'rails', 's', '-b', '0.0.0.0']
     environment:
       RAILS_ENV: development
+    depends_on:
+      - mongo
   mongo:
     image: mongo
 
