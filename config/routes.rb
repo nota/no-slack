@@ -13,5 +13,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "application#vite"
 
-  resources :items
+  resources :items do
+    resources :items
+  end
 end
