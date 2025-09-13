@@ -13,7 +13,7 @@ import {
 function ListItem({ item }) {
   return (
     <li key={item._id}>
-      {item.text}
+      {item.text} <Link to={`/items/${item._id}/upvote`}>+1</Link>
       <br />
       <Link to={`/items/${item._id}`}>comments</Link>
     </li>
@@ -22,7 +22,7 @@ function ListItem({ item }) {
 
 function ItemPage() {
   const { id } = useParams();
-  const [item, setItem] = useState([]);
+  const [item, setItem] = useState({});
   useEffect(() => {
     fetch(`/items/${id}.json`).then((res) => res.json().then(setItem));
   }, []);
@@ -35,8 +35,17 @@ function ItemPage() {
 
   return (
     <ul>
-      <li>{item.text}</li>
-      <List {...{ items, action: `/items/${id}/items` }} />
+      <li>
+        <div>
+          <form action={`/items/${id}`} method="PATCH">
+            Labels:{" "}
+            <input type="text" name="item[labels]" value={item.labels} />
+            <button>update</button>
+          </form>
+        </div>
+        {item.text}
+        <List {...{ items, action: `/items/${id}/items` }} />
+      </li>
     </ul>
   );
 }

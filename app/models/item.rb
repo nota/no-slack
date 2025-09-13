@@ -5,4 +5,6 @@ class Item
 
   field :text, type: String
   validates :text, presence: true
+
+  field :labels, type: Array
 end
