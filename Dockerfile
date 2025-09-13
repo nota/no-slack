@@ -9,6 +9,7 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.4.5
+ARG BUNDLE_PATH=/usr/local/bundle
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -31,11 +32,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
 # Throw-away build stage to reduce size of final image
-FROM build AS build
+FROM dev AS build
+ARG BUNDLE_PATH
 # Set production environment
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_PATH="${BUNDLE_PATH}" \
     BUNDLE_WITHOUT="development"
 
 # Install application gems
@@ -53,11 +55,13 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-
-
-
 # Final stage for app image
 FROM base
+ARG BUNDLE_PATH
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="${BUNDLE_PATH}" \
+    BUNDLE_WITHOUT="development"
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
