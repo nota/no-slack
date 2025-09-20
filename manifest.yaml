@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-slack
+  labels:
+    app: no-slack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: no-slack
+  template:
+    metadata:
+      labels:
+        app: no-slack
+    spec:
+      containers:
+      - name: no-slack
+        image: asia-northeast1-docker.pkg.dev/helpfeelinc-playgrounds-deploy/default/no-slack:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: SECRET_KEY_BASE
+          value: 'nosecret'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: no-slack
+spec:
+  clusterIP: None
+  selector:
+    app: no-slack
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: no-slack
+spec:
+  parentRefs:
+  - name: external-https # name of the gateway
+  hostnames:
+  - "no-slack.helpfeel.co.jp"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/"
+    backendRefs:
+    - name: no-slack
+      port: 80
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: no-slack
+spec:
+  default:
+    iap:
+      enabled: true
+  targetRef:
+    group: ""
+    kind: Service
+    name: no-slack
