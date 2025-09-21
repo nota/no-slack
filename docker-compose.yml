@@ -4,8 +4,9 @@ services:
       context: .
       target: dev
     volumes:
-      - bundle:/usr/local/bundle
       - ./:/app
+      - bundle:/usr/local/bundle
+      - node_modules:/app/node_modules
     working_dir: /app
     ports:
       - 3000:3000
@@ -20,4 +21,6 @@ services:
 
 volumes:
   bundle:
+    driver: local
+  node_modules:
     driver: local
