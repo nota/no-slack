@@ -51,12 +51,14 @@ function ItemPage() {
 }
 
 function List({ items, action }) {
-  // return <h1>Hello, React with Vite-Rails</h1>;
+  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
   return (
     <>
       <ul>
         <li>
-          <form action={action} method="POST" rel="external">
+          <form action={action} method="POST">
+            <input type="hidden" name="authenticity_token" value={token} />
             <textarea name="item[text]"></textarea>
             <button type="submit">post</button>
           </form>
