@@ -71,6 +71,33 @@ function List({ items, action }) {
   );
 }
 
+function Login() {
+  const [authUser, setAuthUser] = useState();
+
+  useEffect(() => {
+    fetch('/auth/user').then(res => res.json()).then(setAuthUser);
+  }, []);
+
+  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+  if (authUser) {
+    return (
+      <form method="delete" action="/auth/session">
+        <span>{authUser.email}</span>
+        <input type="hidden" name="authenticity_token" value={token} />
+        <button type="submit">Logout</button>
+      </form>
+    );
+  } else {
+    return (
+      <form method="post" action="/auth/google_oauth2">
+        <input type="hidden" name="authenticity_token" value={token} />
+        <button type="submit">Login with Google</button>
+      </form>
+    );
+  }
+}
+
 function RootPage() {
   // const fetcher = (url) =>
   //   fetch(url).then(async (res) => {
@@ -88,12 +115,15 @@ function RootPage() {
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<RootPage />} />
-        <Route path="/items/:id" element={<ItemPage />} />
-      </Routes>
-    </Router>
+    <>
+      <Login />
+      <Router>
+        <Routes>
+          <Route path="/" element={<RootPage />} />
+          <Route path="/items/:id" element={<ItemPage />} />
+        </Routes>
+      </Router>
+    </>
   );
   return <Root />;
 }

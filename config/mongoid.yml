@@ -1,3 +1,4 @@
+# NOTE: see config/initailizers/mongoid.rb for common configs
 development:
   # Configure available database clients. (required)
   clients:
@@ -292,7 +293,7 @@ test:
     default:
       database: app_test
       hosts:
-        - localhost:27017
+        - mongo:27017
       options:
         read:
           mode: :primary
