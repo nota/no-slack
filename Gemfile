@@ -5,6 +5,7 @@ gem 'vite_rails'
 gem 'mongoid'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection'
+gem 'dotenv'
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"

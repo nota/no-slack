@@ -14,6 +14,7 @@ spec:
       labels:
         app: no-slack
     spec:
+      serviceAccountName: no-slack
       containers:
       - name: no-slack
         image: asia-northeast1-docker.pkg.dev/helpfeelinc-playgrounds-deploy/default/no-slack:latest
@@ -23,6 +24,17 @@ spec:
         env:
         - name: SECRET_KEY_BASE
           value: 'nosecret'
+        volumeMounts:
+        - mountPath: "/app/.env"
+          name: dotenv
+          subPath: .env
+      volumes:
+      - name: dotenv
+        csi:
+          driver: secrets-store-gke.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: no-slack-env
 ---
 apiVersion: v1
 kind: Service
@@ -67,3 +79,20 @@ spec:
     group: ""
     kind: Service
     name: no-slack
+---
+# https://cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component#use-new-service-account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: no-slack
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: no-slack-env
+spec:
+  provider: gke
+  parameters:
+    secrets: |
+      - resourceName: "projects/helpfeelinc-playgrounds-deploy/secrets/no-slack-env/versions/1"
+        path: ".env"
