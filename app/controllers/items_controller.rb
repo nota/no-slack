@@ -5,7 +5,12 @@ class ItemsController < ApplicationController
 
   def create
     items.create!(params.expect(item: [:text]).merge(user: current_user))
-    redirect_to root_path
+
+    if params[:item_id]
+      redirect_to item_path(params[:item_id])
+    else
+      redirect_to root_path
+    end
   end
 
   def show

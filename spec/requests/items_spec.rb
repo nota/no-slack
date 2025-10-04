@@ -4,14 +4,41 @@ RSpec.describe 'Items', type: :request do
   describe 'POST /items' do
     include_context 'login'
 
-    # let(:item) { Item.find_by(text: 'hello') }
+    let!(:parent) { nil }
+    let(:params) { { item: { text: 'hello' } } }
+    let(:path) { '/items' }
 
     before do
-      post '/items', params: {item: {text: 'hello'}}
+      post path, params:
     end
 
-    context 'item with current_user' do
-      it { expect(Item.where(text: 'hello', user: current_user)).to be_exist }
+    shared_examples_for 'created item' do
+      let(:criteria) { Item.where(text: 'hello', user: current_user) }
+
+      describe 'with current_user' do
+        it { expect(criteria).to be_exist }
+      end
+    end
+
+    context 'root item' do
+      it_behaves_like 'created item' do
+        describe 'parent_id' do
+          it { expect(criteria.first.parent_id).to be_nil  }
+        end
+      end
+
+      it { expect(response).to redirect_to('/') }
+    end
+
+    context 'with parent item' do
+      let!(:parent) { Item.create!(user: User.create!, text: 'parent') }
+      let(:path) { "/items/#{parent.id}/items" }
+
+      it_behaves_like 'created item' do
+        it { expect(Item.where(parent:)).to be_exist }
+      end
+
+      it { expect(response).to redirect_to("/items/#{parent.id}") }
     end
   end
 end
