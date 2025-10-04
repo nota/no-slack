@@ -13,7 +13,7 @@ import {
 function ListItem({ item }) {
   return (
     <li key={item._id}>
-      {item.text} <Link to={`/items/${item._id}/upvote`}>+1</Link>
+      {item.text}{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
       <br />
       <Link to={`/items/${item._id}`}>comments</Link>
     </li>
@@ -37,11 +37,13 @@ function ItemPage() {
     <ul>
       <li>
         <div>
+          {/*
           <form action={`/items/${id}`} method="PATCH">
             Labels:{" "}
-            <input type="text" name="item[labels]" value={item.labels} />
+            <input type="text" name="item[labels]" value={item.labels} />}
             <button>update</button>
           </form>
+          */}
         </div>
         {item.text}
         <List {...{ items, action: `/items/${id}/items` }} />
