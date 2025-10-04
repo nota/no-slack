@@ -25,7 +25,7 @@ spec:
         - name: SECRET_KEY_BASE
           value: 'nosecret'
         volumeMounts:
-        - mountPath: "/app/.env"
+        - mountPath: "/rails/.env"
           name: dotenv
           subPath: .env
       volumes:
