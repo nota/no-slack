@@ -8,4 +8,8 @@ class Item
   validates :text, presence: true
 
   field :labels, type: Array
+
+  def count_children
+    Item.where(parent: self).count
+  end
 end

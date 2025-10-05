@@ -25,7 +25,7 @@ function ListItem({ item }) {
     <li key={item._id}>
       <Item {...{item}} />
       <br />
-      <Link to={`/items/${item._id}`}>comments</Link>
+      <Link to={`/items/${item._id}`}>{item.count_children} comments</Link>
     </li>
   );
 }
@@ -142,6 +142,7 @@ export default function App() {
   return (
     <StrictMode>
       <Login />
+      <hr />
       <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
         <Routes>
           <Route path="/" element={<RootPage />} />
