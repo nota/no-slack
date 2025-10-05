@@ -80,7 +80,7 @@ function List({ items, action }) {
 
   return (
     <>
-      <ul>
+      <ol start='0'>
         <li>
           <form action={action} method="POST">
             <input type="hidden" name="authenticity_token" value={token} />
@@ -91,7 +91,7 @@ function List({ items, action }) {
         {items?.map((item) => {
           return <ListItem key={item._id} {...{ item }} />;
         })}
-      </ul>
+      </ol>
     </>
   );
 }
