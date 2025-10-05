@@ -84,7 +84,7 @@ function List({ items, action }) {
         <li>
           <form action={action} method="POST">
             <input type="hidden" name="authenticity_token" value={token} />
-            <textarea name="item[text]"></textarea>
+            <textarea name="item[text]" style={{maxWidth: '480px', width: '100%'}}></textarea>
             <button type="submit">post</button>
           </form>
         </li>
