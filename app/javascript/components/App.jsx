@@ -10,12 +10,34 @@ import {
   useParams,
 } from "react-router-dom";
 
+function toLocalDateString(dateString) {
+  const date = new Date(dateString);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  // const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
 function Item({ item }) {
+  const email = item.user.auths[0].email;
+  const date = toLocalDateString(item.date);
+
   return (
     <>
-      { item.user.auths[0].email }
-      <br />
-      <div style={{whiteSpace: 'pre-wrap', border: '1px solid lightgray', padding: '1px 3px', maxWidth: '480px'}}>{item.text}</div>
+      <div style={{color: "gray", fontSize: "0.8em"}}>
+        <span title={ email }>{ email.split('@')[0] }</span>
+        {' ('}
+        <span title={ item.date }>{ date }</span>
+        {')'}
+      </div>
+      <div style={{whiteSpace: 'pre-wrap', padding: '0.5em 0'}}>
+        {item.text}
+      </div>
       {/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
     </>
   );
@@ -23,9 +45,11 @@ function Item({ item }) {
 
 function ListItem({ item }) {
   return (
-    <li key={item._id}>
+    <li key={item._id} style={{marginBottom: "1em"}}>
       <Item {...{item}} />
-      <Link to={`/items/${item._id}`}>{item.count_children} comments</Link>
+      <div style={{color: "gray", fontSize: "0.8em"}}>
+        <Link to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
+      </div>
     </li>
   );
 }
@@ -81,10 +105,11 @@ function List({ items, action }) {
   return (
     <>
       <ol start='0'>
-        <li>
+        <li style={{marginBottom: "1em"}}>
           <form action={action} method="POST">
             <input type="hidden" name="authenticity_token" value={token} />
-            <textarea name="item[text]" style={{maxWidth: '480px', width: '100%'}}></textarea>
+            <textarea name="item[text]" style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}}>
+            </textarea>
             <button type="submit">post</button>
           </form>
         </li>
@@ -135,7 +160,14 @@ function RootPage() {
     fetch("/items.json").then((res) => res.json().then(setItems));
   }, []);
 
-  return <List {...{ items, action: "/items" }} />;
+  return (
+    <>
+      <div>
+        <Link>all</Link> | <Link>my items</Link>
+      </div>
+      <List {...{ items, action: "/items" }} />
+    </>
+  );
 }
 
 export default function App() {

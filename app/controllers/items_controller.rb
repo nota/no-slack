@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
   def index
-    render json: items.order_by(id: :desc).limit(30).all.as_json(include: :user, methods: :count_children)
+    render json: items.order_by(id: :desc).limit(30).all
   end
 
   def create
