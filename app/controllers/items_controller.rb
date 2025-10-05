@@ -16,7 +16,7 @@ class ItemsController < ApplicationController
   def show
     respond_to do |format|
       format.html { render html: '', layout: 'application' }
-      format.json { render json: Item.find_by(id: params[:id]) }
+      format.json { render json: Item.find_by(id: params[:id]).as_json(include: :user) }
     end
   end
 

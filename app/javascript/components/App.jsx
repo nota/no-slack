@@ -10,12 +10,20 @@ import {
   useParams,
 } from "react-router-dom";
 
-function ListItem({ item }) {
+function Item({ item }) {
   return (
-    <li key={item._id}>
+    <>
       { item.user.auths[0].email }
       <br />
       {item.text}{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
+    </>
+  );
+}
+
+function ListItem({ item }) {
+  return (
+    <li key={item._id}>
+      <Item {...{item}} />
       <br />
       <Link to={`/items/${item._id}`}>comments</Link>
     </li>
@@ -24,7 +32,7 @@ function ListItem({ item }) {
 
 function ItemPage() {
   const { id } = useParams();
-  const [item, setItem] = useState({});
+  const [item, setItem] = useState();
   useEffect(() => {
     fetch(`/items/${id}.json`).then((res) => res.json().then(setItem));
   }, []);
@@ -35,9 +43,13 @@ function ItemPage() {
       fetch(`/items/${id}/items.json`).then((res) => res.json().then(setItems));
   }, [item]);
 
+  if (!item) {
+    return;
+  }
+
   return (
     <ul>
-      <li>
+      <li key={item._id}>
         <div>
           {/*
           <form action={`/items/${id}`} method="PATCH">
@@ -47,7 +59,7 @@ function ItemPage() {
           </form>
           */}
         </div>
-        {item.text}
+        <Item {...{item}} />
         <List {...{ items, action: `/items/${id}/items` }} />
       </li>
     </ul>
