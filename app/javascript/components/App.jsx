@@ -13,6 +13,8 @@ import {
 function ListItem({ item }) {
   return (
     <li key={item._id}>
+      { item.user.auths[0].email }
+      <br />
       {item.text}{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
       <br />
       <Link to={`/items/${item._id}`}>comments</Link>

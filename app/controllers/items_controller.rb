@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
   def index
-    render json: items.order_by(id: :desc).all
+    render json: items.order_by(id: :desc).all.as_json(include: :user)
   end
 
   def create

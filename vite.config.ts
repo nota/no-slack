@@ -5,4 +5,8 @@ export default defineConfig({
   plugins: [
     RubyPlugin(),
   ],
+  build: {
+    // minify: false,
+    sourcemap: true
+  }
 })
