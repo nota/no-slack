@@ -1,7 +1,7 @@
 // import React, { useState } from "react";
 // import React, { Suspense } from "react";
 // import useSWR from "swr";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, StrictMode } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -35,7 +35,7 @@ function ItemPage() {
   const [item, setItem] = useState();
   useEffect(() => {
     fetch(`/items/${id}.json`).then((res) => res.json().then(setItem));
-  }, []);
+  }, [id]);
 
   const [items, setItems] = useState([]);
   useEffect(() => {
@@ -48,21 +48,30 @@ function ItemPage() {
   }
 
   return (
-    <ul>
-      <li key={item._id}>
-        <div>
-          {/*
-          <form action={`/items/${id}`} method="PATCH">
-            Labels:{" "}
-            <input type="text" name="item[labels]" value={item.labels} />}
-            <button>update</button>
-          </form>
-          */}
-        </div>
-        <Item {...{item}} />
-        <List {...{ items, action: `/items/${id}/items` }} />
-      </li>
-    </ul>
+    <>
+      {
+        item.parent_id
+          ? <Link to={`/items/${item.parent_id}`}>parent</Link>
+          : <Link to='/'>root</Link>
+      }
+      { item &&
+        <ul>
+          <li key={item._id}>
+            <div>
+              {/*
+              <form action={`/items/${id}`} method="PATCH">
+                Labels:{" "}
+                <input type="text" name="item[labels]" value={item.labels} />}
+                <button>update</button>
+              </form>
+              */}
+            </div>
+            <Item {...{item}} />
+            <List {...{ items, action: `/items/${id}/items` }} />
+          </li>
+        </ul>
+      }
+    </>
   );
 }
 
@@ -80,7 +89,7 @@ function List({ items, action }) {
           </form>
         </li>
         {items?.map((item) => {
-          return <ListItem {...{ item }} />;
+          return <ListItem key={item._id} {...{ item }} />;
         })}
       </ul>
     </>
@@ -131,15 +140,15 @@ function RootPage() {
 
 export default function App() {
   return (
-    <>
+    <StrictMode>
       <Login />
-      <Router>
+      <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
         <Routes>
           <Route path="/" element={<RootPage />} />
           <Route path="/items/:id" element={<ItemPage />} />
         </Routes>
       </Router>
-    </>
+    </StrictMode>
   );
   return <Root />;
 }
