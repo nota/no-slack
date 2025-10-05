@@ -15,7 +15,7 @@ function Item({ item }) {
     <>
       { item.user.auths[0].email }
       <br />
-      {item.text}{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
+      <div style={{whiteSpace: 'pre-wrap'}}>{item.text}</div>{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
     </>
   );
 }
@@ -24,7 +24,6 @@ function ListItem({ item }) {
   return (
     <li key={item._id}>
       <Item {...{item}} />
-      <br />
       <Link to={`/items/${item._id}`}>{item.count_children} comments</Link>
     </li>
   );
