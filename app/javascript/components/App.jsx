@@ -15,7 +15,8 @@ function Item({ item }) {
     <>
       { item.user.auths[0].email }
       <br />
-      <div style={{whiteSpace: 'pre-wrap'}}>{item.text}</div>{/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
+      <div style={{whiteSpace: 'pre-wrap', border: '1px solid lightgray', padding: '1px 3px', maxWidth: '480px'}}>{item.text}</div>
+      {/* <Link to={`/items/${item._id}/upvote`}>+1</Link> */}
     </>
   );
 }
