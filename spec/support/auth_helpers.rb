@@ -2,7 +2,7 @@ RSpec.shared_context 'login' do
   let(:auth_provider) { 'google_oauth2' }
   let(:auth_uid) { '123' }
   let(:auth_email) { 'adam@example.com' }
-  let!(:current_user) { User.create!(auths: [{provider: auth_provider, uid: auth_uid, email: auth_email}]) }
+  let!(:current_user) { User.create!(name: 'adam',auths: [{provider: auth_provider, uid: auth_uid, email: auth_email}]) }
 
   let(:auth_env) do
     {

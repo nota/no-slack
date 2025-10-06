@@ -15,8 +15,29 @@ class Item
   field :text, type: String
   validates :text, presence: true
 
-  field :labels, type: Array
+  # field :labels, type: Array
 
+  class Participant
+    include Mongoid::Document
+
+    belongs_to :user
+    field :role, type: String
+
+    embedded_in :item
+  end
+  embeds_many :participants
+
+  before_create do
+    text.scan(/@(\w+)/).flatten.each do |name|
+      user = User.find_by(name:) || User.create!(name:)
+      participants.build(user:, role: 'assignee')
+    end
+    if participants.present?
+      participants.build(user:, role: 'requester')
+    end
+  end
+
+  # as_json
   def count_children
     Item.where(parent: self).count
   end

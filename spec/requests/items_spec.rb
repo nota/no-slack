@@ -40,5 +40,21 @@ RSpec.describe 'Items', type: :request do
 
       it { expect(response).to redirect_to("/items/#{parent.id}") }
     end
+
+    context 'with mention' do
+      # let!(:bob) { User.all.to_a;User.create!(name: 'bob') }
+
+      let(:params) { { item: { text: '@bob, give me a favor.' } } }
+
+      describe 'participants' do
+        describe 'assignee' do
+          it { expect(Item.first.participants.find_by(role: 'assignee').user).to eq(User.find_by(name: 'bob')) }
+        end
+
+        describe 'requester' do
+          it { expect(Item.first.participants.find_by(role: 'requester').user).to eq(current_user) }
+        end
+      end
+    end
   end
 end
