@@ -1,7 +1,7 @@
 // import React, { useState } from "react";
 // import React, { Suspense } from "react";
 // import useSWR from "swr";
-import React, { useState, useEffect, StrictMode } from "react";
+import React, { useState, useEffect, useContext, createContext, StrictMode } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,6 +10,8 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
+
+const AuthUserContext = createContext();
 
 function toLocalDateString(dateString) {
   const date = new Date(dateString);
@@ -123,7 +125,8 @@ function List({ items, action }) {
 }
 
 function Login() {
-  const [authUser, setAuthUser] = useState();
+  const { authUser, setAuthUser } = useContext(AuthUserContext);
+  // const [authUser, setAuthUser] = useState();
 
   useEffect(() => {
     fetch('/auth/user').then(res => res.json()).then(setAuthUser);
@@ -157,6 +160,7 @@ function RootPage() {
   //     return res.json();
   //   });
   // const { items, error, isLoading } = useSWR("/items.json", fetcher);
+  const { authUser } = useContext(AuthUserContext);
   const [searchParams] = useSearchParams();
 
   const [items, setItems] = useState([]);
@@ -167,7 +171,9 @@ function RootPage() {
   return (
     <>
       <div>
-        <Link>all</Link> | <Link>my items</Link>
+        <Link to='/'>all</Link>
+        {" | "}
+        <Link to={`/?assignee=${authUser?.name}`}>my items</Link>
       </div>
       <List {...{ items, action: "/items" }} />
     </>
@@ -175,17 +181,21 @@ function RootPage() {
 }
 
 export default function App() {
+  const [authUser, setAuthUser] = useState();
+
   return (
-    <StrictMode>
-      <Login />
-      <hr />
-      <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
-        <Routes>
-          <Route path="/" element={<RootPage />} />
-          <Route path="/items/:id" element={<ItemPage />} />
-        </Routes>
-      </Router>
-    </StrictMode>
+    <AuthUserContext.Provider value={{authUser, setAuthUser}}>
+      <StrictMode>
+        <Login />
+        <hr />
+        <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
+          <Routes>
+            <Route path="/" element={<RootPage />} />
+            <Route path="/items/:id" element={<ItemPage />} />
+          </Routes>
+        </Router>
+      </StrictMode>
+    </AuthUserContext.Provider>
   );
   return <Root />;
 }
