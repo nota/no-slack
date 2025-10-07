@@ -2,7 +2,11 @@ class User
   include Mongoid::Document
 
   field :name, type: String
-  validates :name, uniqueness: true
+  validates :name, uniqueness: true, allow_nil: true
+
+  before_create do
+    self.name ||= auths.first.email.split('@').first
+  end
 
   class Auth
     include Mongoid::Document

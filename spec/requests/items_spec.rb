@@ -1,6 +1,30 @@
 require 'rails_helper'
 
 RSpec.describe 'Items', type: :request do
+  describe 'GET /items.json' do
+    context '?assignee=adam' do
+      let!(:adam) { User.create!(name: 'adam') }
+      let!(:bob) { User.create!(name: 'bob') }
+      let!(:adam_item) { Item.create!(text: 'nope', user: adam) }
+      let!(:bob_hey_adam_item) { Item.create!(text: 'Hey @adam', user: bob) }
+      let!(:adam_hello_bob_item) { Item.create!(text: 'Hello @bob', user: adam) }
+
+      before do
+        get '/items.json', params: { assignee: 'adam' }
+      end
+
+      subject { response.parsed_body }
+
+      describe 'count' do
+        it { expect(subject.size).to eq(1) }
+      end
+
+      describe 'the item.text' do
+        it { expect(subject.first[:text]).to eq(bob_hey_adam_item.text) }
+      end
+    end
+  end
+
   describe 'POST /items' do
     include_context 'login'
 

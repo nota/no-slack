@@ -8,6 +8,7 @@ import {
   Route,
   Link,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 
 function toLocalDateString(dateString) {
@@ -133,7 +134,8 @@ function Login() {
   if (authUser) {
     return (
       <form method="delete" action="/auth/session">
-        <span>{authUser.email}</span>
+        <span title={authUser.email}>{authUser.name}</span>
+        {" "}
         <input type="hidden" name="authenticity_token" value={token} />
         <button type="submit">Logout</button>
       </form>
@@ -155,10 +157,12 @@ function RootPage() {
   //     return res.json();
   //   });
   // const { items, error, isLoading } = useSWR("/items.json", fetcher);
+  const [searchParams] = useSearchParams();
+
   const [items, setItems] = useState([]);
   useEffect(() => {
-    fetch("/items.json").then((res) => res.json().then(setItems));
-  }, []);
+    fetch(`/items.json?${searchParams.toString()}`).then((res) => res.json().then(setItems));
+  }, [searchParams]);
 
   return (
     <>

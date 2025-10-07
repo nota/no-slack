@@ -34,11 +34,15 @@ RSpec.describe 'Auths', type: :request do
       end
 
       context 'uid not known' do
-        it_behaves_like 'login_succeeded'
+        it_behaves_like 'login_succeeded' do
+          describe 'user.name' do
+            it { expect(user_criteria.first.name).to eq('adam') }
+          end
+        end
       end
 
       context 'uid exist' do
-        let(:user) { User.create!(auths: [{provider:, uid:, email: 'adam@example.com'}]) }
+        let(:user) { User.create!(name: 'adam', auths: [{provider:, uid:, email: 'adam@example.com'}]) }
 
         it_behaves_like 'login_succeeded' do
           context 'session[:user_id]' do
