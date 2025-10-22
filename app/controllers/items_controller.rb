@@ -8,9 +8,9 @@ class ItemsController < ApplicationController
   end
 
   def index
-    if params[:assignee]
-      user_id = User.where(name: params[:assignee]).pick(:id)
-      @items = @items.where(:participants.elem_match => {role: 'assignee', user_id:})
+    if params[:actor]
+      user_id = User.where(name: params[:actor]).pick(:id)
+      @items = @items.where(:participants.elem_match => {actor: true, user_id:})
     end
 
     render json: @items.order_by(id: :desc).limit(30).all
@@ -20,6 +20,13 @@ class ItemsController < ApplicationController
     @items.create!(params.expect(item: [:text]).merge(user: current_user))
 
     if params[:item_id]
+      if params[:done]
+        # https://www.mongodb.com/docs/manual/reference/operator/update/positional/
+        # TODO: test を追加
+        Item.collection.find(_id: BSON::ObjectId(params[:item_id]), 'participants.user_id': current_user.id)
+          .update_one('$set': {'participants.$[].actor': false })
+      end
+
       redirect_to item_path(params[:item_id])
     else
       redirect_to root_path

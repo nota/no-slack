@@ -94,7 +94,7 @@ function ItemPage() {
               */}
             </div>
             <Item {...{item}} />
-            <List {...{ items, action: `/items/${id}/items` }} />
+            <List {...{ items, action: `/items/${id}/items`, parent: item }} />
           </li>
         </ul>
       }
@@ -102,8 +102,11 @@ function ItemPage() {
   );
 }
 
-function List({ items, action }) {
+function List({ items, action, parent }) {
   const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  const [searchParams] = useSearchParams();
+  const actor = searchParams.get('actor');
+  const mention = actor ? `@${actor} ` : '';
 
   return (
     <>
@@ -111,9 +114,16 @@ function List({ items, action }) {
         <li style={{marginBottom: "1em"}}>
           <form action={action} method="POST">
             <input type="hidden" name="authenticity_token" value={token} />
-            <textarea name="item[text]" style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}}>
+            <textarea name="item[text]" defaultValue={mention} style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}}>
             </textarea>
+            <br/>
             <button type="submit">post</button>
+            { parent &&
+              <label>
+                <input type='checkbox' name='done' />
+                done
+              </label>
+            }
           </form>
         </li>
         {items?.map((item) => {
@@ -162,10 +172,11 @@ function RootPage() {
   // const { items, error, isLoading } = useSWR("/items.json", fetcher);
   const { authUser } = useContext(AuthUserContext);
   const [searchParams] = useSearchParams();
+  const query = searchParams.toString();
 
   const [items, setItems] = useState([]);
   useEffect(() => {
-    fetch(`/items.json?${searchParams.toString()}`).then((res) => res.json().then(setItems));
+    fetch(`/items.json?${query}`).then((res) => res.json().then(setItems));
   }, [searchParams]);
 
   return (
@@ -173,9 +184,9 @@ function RootPage() {
       <div>
         <Link to='/'>all</Link>
         {" | "}
-        <Link to={`/?assignee=${authUser?.name}`}>my items</Link>
+        <Link to={`/?actor=${authUser?.name}`}>my items</Link>
       </div>
-      <List {...{ items, action: "/items" }} />
+      <List {...{ items, action: '/items' }} />
     </>
   );
 }

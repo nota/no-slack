@@ -21,19 +21,21 @@ class Item
     include Mongoid::Document
 
     belongs_to :user
-    field :role, type: String
+    # field :role, type: String
+    # field :done, type: Boolean
+    field :actor, type: Boolean
 
     embedded_in :item
   end
   embeds_many :participants
 
   before_create do
-    text.scan(/@(\w+)/).flatten.each do |name|
+    text.scan(/@(\w+)/).flatten.uniq.each do |name|
       user = User.find_by(name:) || User.create!(name:)
-      participants.build(user:, role: 'assignee')
+      participants.build(user:, actor: true)
     end
-    if participants.present?
-      participants.build(user:, role: 'requester')
+    if participants.present? && !participants.where(user:).exists?
+      participants.build(user:, actor: false)
     end
   end
 
