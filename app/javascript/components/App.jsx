@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 
 const AuthUserContext = createContext();
+const ItemsContext = createContext();
 
 function toLocalDateString(dateString) {
   const date = new Date(dateString);
@@ -65,17 +66,18 @@ function ItemPage() {
   }, [id]);
 
   const [items, setItems] = useState([]);
+  const [reload, setReload] = useState(Date.now());
   useEffect(() => {
     item &&
       fetch(`/items/${id}/items.json`).then((res) => res.json().then(setItems));
-  }, [item]);
+  }, [item, reload]);
 
   if (!item) {
     return;
   }
 
   return (
-    <>
+    <ItemsContext.Provider value={{reload, setReload}}>
       {
         item.parent_id
           ? <Link to={`/items/${item.parent_id}`}>parent</Link>
@@ -98,33 +100,59 @@ function ItemPage() {
           </li>
         </ul>
       }
-    </>
+    </ItemsContext.Provider>
   );
 }
 
-function List({ items, action, parent }) {
+function ItemForm({action, parent}) {
   const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   const [searchParams] = useSearchParams();
   const actor = searchParams.get('actor');
   const mention = actor ? `@${actor} ` : '';
+  const { setReload } = useContext(ItemsContext);
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const response = await fetch(action, {
+      method: 'POST',
+      body: new FormData(form)
+    });
+    if (response.ok) {
+      form.reset();
+      setReload(Date.now())
+    } else {
+      // TODO: error handling
+    }
+  };
+
+  return (
+    <form action={action} method="POST" onSubmit={handleSubmit}>
+      <input type="hidden" name="authenticity_token" value={token} />
+      <textarea
+        name="item[text]"
+        defaultValue={mention}
+        style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}
+      }>
+      </textarea>
+      <br/>
+      <button type="submit">post</button>
+      { parent &&
+        <label>
+          <input type='checkbox' name='done' />
+          done
+        </label>
+      }
+    </form>
+  );
+}
+
+function List({ items, action, parent }) {
   return (
     <>
       <ol start='0'>
         <li style={{marginBottom: "1em"}}>
-          <form action={action} method="POST">
-            <input type="hidden" name="authenticity_token" value={token} />
-            <textarea name="item[text]" defaultValue={mention} style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}}>
-            </textarea>
-            <br/>
-            <button type="submit">post</button>
-            { parent &&
-              <label>
-                <input type='checkbox' name='done' />
-                done
-              </label>
-            }
-          </form>
+          <ItemForm {...{action, parent}}/>
         </li>
         {items?.map((item) => {
           return <ListItem key={item._id} {...{ item }} />;
@@ -175,19 +203,20 @@ function RootPage() {
   const query = searchParams.toString();
 
   const [items, setItems] = useState([]);
+  const [reload, setReload] = useState(Date.now());
   useEffect(() => {
     fetch(`/items.json?${query}`).then((res) => res.json().then(setItems));
-  }, [searchParams]);
+  }, [searchParams, reload]);
 
   return (
-    <>
+    <ItemsContext.Provider value={{reload, setReload}}>
       <div>
         <Link to='/'>all</Link>
         {" | "}
         <Link to={`/?actor=${authUser?.name}`}>my items</Link>
       </div>
       <List {...{ items, action: '/items' }} />
-    </>
+    </ItemsContext.Provider>
   );
 }
 

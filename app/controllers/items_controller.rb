@@ -26,11 +26,12 @@ class ItemsController < ApplicationController
         Item.collection.find(_id: BSON::ObjectId(params[:item_id]), 'participants.user_id': current_user.id)
           .update_one('$set': {'participants.$[].actor': false })
       end
-
-      redirect_to item_path(params[:item_id])
+      # redirect_to item_path(params[:item_id])
     else
-      redirect_to root_path
+      # redirect_to root_path
     end
+
+    head :created
   end
 
   def show
