@@ -26,6 +26,14 @@ class Item
     field :actor, type: Boolean
 
     embedded_in :item
+
+    # def as_json(options={})
+    #   super(
+    #     {
+    #       include: :user
+    #     }
+    #   ).merge(options)
+    # end
   end
   embeds_many :participants
 
@@ -51,7 +59,7 @@ class Item
   def as_json(options={})
     super(
       {
-        include: :user,
+        include: [:user, {participants: {include: :user}}],
         methods: [:count_children, :date]
       }.merge(options)
     )

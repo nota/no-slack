@@ -47,12 +47,30 @@ function Item({ item }) {
   );
 }
 
+function Participants({ item }) {
+  return (
+    <span style={{display: 'inline-flex', gap:'0.5em'}}>
+      {
+        item.participants?.map((p) => {
+          return (
+            <span key={p._id}>
+              <input type='checkbox' checked={!p.actor} disabled />
+              {p.user?.name}
+            </span>
+          );
+        })
+      }
+    </span>
+  );
+}
+
 function ListItem({ item }) {
   return (
     <li key={item._id} style={{marginBottom: "1em"}}>
       <Item {...{item}} />
       <div style={{color: "gray", fontSize: "0.8em"}}>
-        <Link to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
+        <Link key='comments' to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
+        <Participants {...{item}} />
       </div>
     </li>
   );
@@ -96,6 +114,7 @@ function ItemPage() {
               */}
             </div>
             <Item {...{item}} />
+            <Participants {...{item}} />
             <List {...{ items, action: `/items/${id}/items`, parent: item }} />
           </li>
         </ul>
