@@ -230,10 +230,10 @@ function RootPage() {
 
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
-      <div>
+      <div style={{display: 'flex', gap: '1em'}}>
         <Link to='/'>all</Link>
-        {" | "}
         <Link to={`/?actor=${authUser?.name}`}>my items</Link>
+        <Link to={`/?waiting=${authUser?.name}`}>waiting</Link>
       </div>
       <List {...{ items, action: '/items' }} />
     </ItemsContext.Provider>

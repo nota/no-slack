@@ -11,6 +11,12 @@ class ItemsController < ApplicationController
     if params[:actor]
       user_id = User.where(name: params[:actor]).pick(:id)
       @items = @items.where(:participants.elem_match => {actor: true, user_id:})
+    elsif params[:waiting]
+      user_id = User.where(name: params[:waiting]).pick(:id)
+      @items = @items.where(
+        :participants.elem_match => {:actor.ne => true, user_id:},
+        :participants.elem_match => {actor: true, :user_id.ne => user_id}
+      )
     end
 
     render json: @items.order_by(id: :desc).limit(30).all
