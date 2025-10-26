@@ -9,6 +9,7 @@ import {
   Link,
   useParams,
   useSearchParams,
+  useLocation
 } from "react-router-dom";
 
 const AuthUserContext = createContext();
@@ -211,6 +212,15 @@ function Login() {
   }
 }
 
+function LinkToUnlessCurrent({ to, children, ...props }) {
+  const location = useLocation();
+  const loc = location.pathname + location.search;
+  if (loc  === to) {
+    return <span {...props}>{children}</span>;
+  }
+  return <Link to={to} {...props}>{children}</Link>;
+}
+
 function RootPage() {
   // const fetcher = (url) =>
   //   fetch(url).then(async (res) => {
@@ -231,9 +241,9 @@ function RootPage() {
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
       <div style={{display: 'flex', gap: '1em'}}>
-        <Link to='/'>all</Link>
-        <Link to={`/?actor=${authUser?.name}`}>my items</Link>
-        <Link to={`/?waiting=${authUser?.name}`}>waiting</Link>
+        <LinkToUnlessCurrent to='/'>all</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to={`/?actor=${authUser?.name}`}>my items</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to={`/?waiting=${authUser?.name}`}>waiting</LinkToUnlessCurrent>
       </div>
       <List {...{ items, action: '/items' }} />
     </ItemsContext.Provider>
