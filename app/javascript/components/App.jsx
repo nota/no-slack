@@ -96,11 +96,12 @@ function ItemPage() {
 
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
-      {
-        item.parent_id
-          ? <Link to={`/items/${item.parent_id}`}>parent</Link>
-          : <Link to='/'>root</Link>
-      }
+      <div style={{display: 'flex', gap: '0.5em'}}>
+        <Link to='/'>root</Link>
+        {
+          item.parent_id && <Link to={`/items/${item.parent_id}`}>parent</Link>
+        }
+      </div>
       { item &&
         <ul>
           <li key={item._id}>
