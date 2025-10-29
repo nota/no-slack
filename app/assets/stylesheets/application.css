@@ -11,3 +11,22 @@
 body {
   font-family: Google Sans Flex, Google Sans, Helvetica Neue, sans-serif;
 }
+
+.focusable {
+  position: relative;
+}
+
+/* .focusable:focus { */
+/*   background-color: lightgray; */
+/* } */
+
+.btn {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.focusable:focus .btn {
+  display: block;
+}

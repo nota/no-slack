@@ -7,7 +7,7 @@ class UsersController < ApplicationController
       criteria = criteria.where(name: /#{name}/)
     end
 
-    excepts = params[:excepts].map(&:strip)
+    excepts = params[:excepts]&.map(&:strip)
     if excepts.present?
       criteria = criteria.nin(_id: excepts)
     end

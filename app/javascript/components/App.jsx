@@ -132,7 +132,6 @@ function UserInput() {
 
   const handleActive = (e) => {
     const name = e.target.value;
-    console.log({ name });
     setValue(name);
 
     const params = new URLSearchParams({name});
@@ -146,7 +145,6 @@ function UserInput() {
   };
 
   const handleClick = (user) => {
-    console.log('click');
     setUsers([...users, user]);
   };
 
@@ -169,14 +167,19 @@ function UserInput() {
     },
   };
 
+  const removeUser = (userId) => {
+    setUsers(users.filter(user => user._id !== userId));
+  };
+
   return (
     <span style={{display: 'flex', gap: '0.5em'}}>
       {
         users.map((user, i) => {
           return (
-            <span key={i}>
+            <span key={i} tabIndex='0' className='focusable'>
               @{ user.name }
               <input type='hidden' name='participants[]user_id' value={user._id} />
+              <button type='button' className='btn' onMouseDown={() => removeUser(user._id)}>X</button>
             </span>
           );
         })
