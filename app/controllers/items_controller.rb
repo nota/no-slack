@@ -23,7 +23,14 @@ class ItemsController < ApplicationController
   end
 
   def create
-    @items.create!(params.expect(item: [:text]).merge(user: current_user))
+    item = @items.new(params.expect(item: [:text]).merge(user: current_user))
+    params[:participants].each do |hash|
+      user = User.find_by(id: hash[:user_id])
+      if user
+        item.participants.build(user:)
+      end
+    end
+    item.save!
 
     if params[:item_id]
       if params[:done]

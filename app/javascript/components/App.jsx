@@ -125,6 +125,82 @@ function ItemPage() {
   );
 }
 
+function UserInput() {
+  const [suggests, setSuggests] = useState([]);
+  // const [showSuggestion, setShowSuggestion] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [value, setValue] = useState('');
+
+  const handleActive = (e) => {
+    const name = e.target.value;
+    console.log({ name });
+    setValue(name);
+    fetch(`/users?name=${name}`).then((res) => res.json()).then(setSuggests);
+    // setSuggests([{name: 'adam'}, {name: 'bob'}]);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => setSuggests([]), 100);
+  };
+
+  const handleClick = (user) => {
+    console.log('click');
+    setUsers([...users, user]);
+  };
+
+  const style = {
+    wrapper: {
+      position: 'relative',
+      display: 'inline-block'
+    },
+    input: {
+      width: '10em'
+    },
+    list: {
+      position: 'absolute',
+      left: '0',
+      width: '10em',
+      border: suggests.length > 0 && 'solid 1px',
+      padding: '0',
+      listStyle: 'none',
+      backgroundColor: 'white'
+    },
+  };
+
+  return (
+    <span style={{display: 'flex', gap: '0.5em'}}>
+      {
+        users.map((user, i) => {
+          return (
+            <span key={i}>
+              @{ user.name }
+              <input type='hidden' name='participants[]user_id' value={user._id} />
+            </span>
+          );
+        })
+      }
+      <div style={style.wrapper}>
+        <input
+          type="text"
+          value={value}
+          onChange={handleActive}
+          onFocus={handleActive}
+          onBlur={handleBlur}
+          style={style.input}
+          onKeyDown={(e) => {if(event.key === 'Enter'){e.preventDefault()}}}
+        />
+        <ul style={style.list}>
+          {
+            suggests.map((user, i) => {
+              return <li key={i} onClick={() => handleClick(user)}>{user.name}</li>;
+            })
+          }
+        </ul>
+      </div>
+    </span>
+  );
+}
+
 function ItemForm({action, parent}) {
   const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   const [searchParams] = useSearchParams();
@@ -148,23 +224,26 @@ function ItemForm({action, parent}) {
   };
 
   return (
-    <form action={action} method="POST" onSubmit={handleSubmit}>
-      <input type="hidden" name="authenticity_token" value={token} />
-      <textarea
-        name="item[text]"
-        defaultValue={mention}
-        style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}
-      }>
-      </textarea>
-      <br/>
-      <button type="submit">post</button>
-      { parent &&
-        <label>
-          <input type='checkbox' name='done' />
-          done
-        </label>
-      }
-    </form>
+    <>
+      <form action={action} method="POST" onSubmit={handleSubmit}>
+        <UserInput />
+        <input type="hidden" name="authenticity_token" value={token} />
+        <textarea
+          name="item[text]"
+          defaultValue={mention}
+          style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}
+        }>
+        </textarea>
+        <br/>
+        <button type="submit">post</button>
+        { parent &&
+          <label>
+            <input type='checkbox' name='done' />
+            done
+          </label>
+        }
+      </form>
+    </>
   );
 }
 

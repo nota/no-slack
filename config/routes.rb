@@ -12,10 +12,12 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "application#vite"
-  get 'auth/:provider/callback' => 'auth#callback'
-  get 'auth/user' => 'auth#user'
+  get '/auth/:provider/callback' => 'auth#callback'
+  get '/auth/user' => 'auth#user'
 
   resources :items do
     resources :items
   end
+
+  get '/users' => 'users#index'
 end
