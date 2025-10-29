@@ -127,7 +127,6 @@ function ItemPage() {
 
 function UserInput() {
   const [suggests, setSuggests] = useState([]);
-  // const [showSuggestion, setShowSuggestion] = useState(false);
   const [users, setUsers] = useState([]);
   const [value, setValue] = useState('');
 
@@ -135,8 +134,11 @@ function UserInput() {
     const name = e.target.value;
     console.log({ name });
     setValue(name);
-    fetch(`/users?name=${name}`).then((res) => res.json()).then(setSuggests);
-    // setSuggests([{name: 'adam'}, {name: 'bob'}]);
+
+    const params = new URLSearchParams({name});
+    // const excepts = users.map(u => u._id);
+    users.forEach(u => params.append('excepts[]', u._id));
+    fetch(`/users?${params.toString()}`).then((res) => res.json()).then(setSuggests);
   };
 
   const handleBlur = () => {
@@ -181,7 +183,8 @@ function UserInput() {
       }
       <div style={style.wrapper}>
         <input
-          type="text"
+          type='text'
+          placeholder='participants'
           value={value}
           onChange={handleActive}
           onFocus={handleActive}
