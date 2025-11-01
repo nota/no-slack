@@ -23,10 +23,18 @@ body {
 .btn {
   display: none;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -0.8em;
+  right: -0.8em;
 }
 
 .focusable:focus .btn {
   display: block;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background-color: lightgray;
 }

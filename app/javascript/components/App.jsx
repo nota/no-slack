@@ -176,7 +176,7 @@ function UserInput() {
       {
         users.map((user, i) => {
           return (
-            <span key={i} tabIndex='0' className='focusable'>
+            <span key={i} tabIndex='0' className='focusable clickable'>
               @{ user.name }
               <input type='hidden' name='participants[]user_id' value={user._id} />
               <button type='button' className='btn' onMouseDown={() => removeUser(user._id)}>X</button>
@@ -198,7 +198,7 @@ function UserInput() {
         <ul style={style.list}>
           {
             suggests.map((user, i) => {
-              return <li key={i} onClick={() => handleClick(user)}>{user.name}</li>;
+              return <li key={i} onClick={() => handleClick(user)} className='clickable'>{user.name}</li>;
             })
           }
         </ul>
