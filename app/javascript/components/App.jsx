@@ -133,10 +133,14 @@ function UserInput({userIds}) {
   const [value, setValue] = useState('');
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    userIds.forEach(id => params.append('user_ids[]', id));
+    if (userIds.length > 0) {
+      const params = new URLSearchParams();
+      userIds.forEach(id => params.append('user_ids[]', id));
 
-    fetch(`/users?${params.toString()}`).then((res) => res.json()).then(setUsers);
+      fetch(`/users?${params.toString()}`).then((res) => res.json()).then(setUsers);
+    } else {
+      setUsers([]);
+    }
   }, [userIds]);
 
   const handleActive = (e) => {
@@ -313,7 +317,8 @@ function LinkToUnlessCurrent({ to, children, ...props }) {
   return <Link to={to} {...props}>{children}</Link>;
 }
 
-function RootPage() {
+function RootPage({ parent }) {
+  // console.log({parent});
   // const fetcher = (url) =>
   //   fetch(url).then(async (res) => {
   //     console.log(await res.json());
@@ -322,18 +327,26 @@ function RootPage() {
   // const { items, error, isLoading } = useSWR("/items.json", fetcher);
   const { authUser } = useContext(AuthUserContext);
   const [searchParams] = useSearchParams();
-  const query = searchParams.toString();
+
+  // Create a new URLSearchParams to avoid mutating the original
+  const params = new URLSearchParams(searchParams);
+  if (parent) {
+    params.set('item_id', parent);
+  }
+  const query = params.toString();
+  console.log({parent, query});
 
   const [items, setItems] = useState([]);
   const [reload, setReload] = useState(Date.now());
   useEffect(() => {
     fetch(`/items.json?${query}`).then((res) => res.json().then(setItems));
-  }, [searchParams, reload]);
+  }, [query, reload]);
 
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
       <div style={{display: 'flex', gap: '0.6em'}}>
-        <LinkToUnlessCurrent to='/'>all</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to='/items'>all</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to='/'>root</LinkToUnlessCurrent>
         <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
         <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
       </div>
@@ -353,6 +366,7 @@ export default function App() {
         <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
           <Routes>
             <Route path="/" element={<RootPage />} />
+            <Route path="/items" element={<RootPage parent='*'/>} />
             <Route path="/items/:id" element={<ItemPage />} />
           </Routes>
         </Router>

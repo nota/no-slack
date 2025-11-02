@@ -1,33 +1,40 @@
 class ItemsController < ApplicationController
   before_action only: [:index, :create] do
-    if params[:item_id]
-      @items = Item.where(parent_id: params[:item_id])
-    else
-      # @items = Item.where(parent_id: nil)
+    case params[:item_id]
+    when '*'
       @items = Item.all
+    when :blank?
+      @items = Item.where(parent_id: nil)
+    else
+      @items = Item.where(parent_id: params[:item_id])
     end
   end
 
   def index
-    if params[:actor]
-      # user_id = User.where(id: params[:actor]).pick(:id)
-      user_id = BSON::ObjectId(params[:actor])
-      @items = @items.where(:participants.elem_match => {actor: true, user_id:})
-    elsif params[:waiting]
-      # user_id = User.where(name: params[:waiting]).pick(:id)
-      user_id = BSON::ObjectId(params[:waiting])
-      @items = @items.where(
-        :participants.elem_match => {:actor.ne => true, user_id:},
-        :participants.elem_match => {actor: true, :user_id.ne => user_id}
-      )
-    # else #root
-    #   @items = @item
+    respond_to do |format|
+      format.html { render html: '', layout: 'application' }
+      format.json do
+        if params[:actor]
+          # user_id = User.where(id: params[:actor]).pick(:id)
+          user_id = BSON::ObjectId(params[:actor])
+          @items = @items.where(:participants.elem_match => {actor: true, user_id:})
+        elsif params[:waiting]
+          # user_id = User.where(name: params[:waiting]).pick(:id)
+          user_id = BSON::ObjectId(params[:waiting])
+          @items = @items.where(
+            :participants.elem_match => {:actor.ne => true, user_id:},
+            :participants.elem_match => {actor: true, :user_id.ne => user_id}
+          )
+        # else #root
+        #   @items = @item
+        end
+
+        render json: @items.order_by(id: :desc).limit(30).all
+
+      rescue BSON::Error::InvalidObjectId
+        render json: [], status: :not_found
+      end
     end
-
-    render json: @items.order_by(id: :desc).limit(30).all
-
-  rescue BSON::Error::InvalidObjectId
-    render json: [], status: :not_found
   end
 
   def create
