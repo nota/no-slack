@@ -3,7 +3,8 @@ class ItemsController < ApplicationController
     if params[:item_id]
       @items = Item.where(parent_id: params[:item_id])
     else
-      @items = Item.where(parent_id: nil)
+      # @items = Item.where(parent_id: nil)
+      @items = Item.all
     end
   end
 
@@ -17,6 +18,8 @@ class ItemsController < ApplicationController
         :participants.elem_match => {:actor.ne => true, user_id:},
         :participants.elem_match => {actor: true, :user_id.ne => user_id}
       )
+    # else #root
+    #   @items = @item
     end
 
     render json: @items.order_by(id: :desc).limit(30).all
