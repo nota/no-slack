@@ -240,7 +240,7 @@ function ItemForm({action, parent}) {
   return (
     <>
       <form action={action} method="POST" onSubmit={handleSubmit}>
-        <UserInput userIds={[actor]} />
+        <UserInput userIds={actor ? [actor] : []} />
         <input type="hidden" name="authenticity_token" value={token} />
         <textarea
           name="item[text]"
