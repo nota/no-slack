@@ -27,10 +27,10 @@ class ItemsController < ApplicationController
 
   def create
     item = @items.new(params.expect(item: [:text]).merge(user: current_user))
-    params[:participants].each do |hash|
+    params[:participants]&.each do |hash|
       user = User.find_by(id: hash[:user_id])
       if user
-        item.participants.build(user:)
+        item.participants.build(user:, actor: true)
       end
     end
     item.save!
