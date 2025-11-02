@@ -127,10 +127,17 @@ function ItemPage() {
   );
 }
 
-function UserInput() {
+function UserInput({userIds}) {
   const [suggests, setSuggests] = useState([]);
   const [users, setUsers] = useState([]);
   const [value, setValue] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    userIds.forEach(id => params.append('user_ids[]', id));
+
+    fetch(`/users?${params.toString()}`).then((res) => res.json()).then(setUsers);
+  }, [userIds]);
 
   const handleActive = (e) => {
     const name = e.target.value;
@@ -213,7 +220,6 @@ function ItemForm({action, parent}) {
   const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   const [searchParams] = useSearchParams();
   const actor = searchParams.get('actor');
-  const mention = actor ? `@${actor} ` : '';
   const { setReload } = useContext(ItemsContext);
 
   const handleSubmit = async (event) => {
@@ -234,11 +240,10 @@ function ItemForm({action, parent}) {
   return (
     <>
       <form action={action} method="POST" onSubmit={handleSubmit}>
-        <UserInput />
+        <UserInput userIds={[actor]} />
         <input type="hidden" name="authenticity_token" value={token} />
         <textarea
           name="item[text]"
-          defaultValue={mention}
           style={{maxWidth: '480px', width: '100%', border: '1px solid lightgray'}
         }>
         </textarea>
@@ -327,10 +332,10 @@ function RootPage() {
 
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
-      <div style={{display: 'flex', gap: '1em'}}>
+      <div style={{display: 'flex', gap: '0.6em'}}>
         <LinkToUnlessCurrent to='/'>all</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?actor=${authUser?.name}`}>my items</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?waiting=${authUser?.name}`}>waiting</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
+        <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
       </div>
       <List {...{ items, action: '/items' }} />
     </ItemsContext.Provider>
