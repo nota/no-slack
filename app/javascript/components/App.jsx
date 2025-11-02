@@ -67,7 +67,7 @@ function Participants({ item }) {
 
 function ListItem({ item }) {
   return (
-    <li key={item._id} style={{marginBottom: "1em"}}>
+    <li key={item._id} className='item'>
       <Item {...{item}} />
       <div style={{color: "gray", fontSize: "0.8em"}}>
         <Link key='comments' to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
@@ -115,8 +115,10 @@ function ItemPage() {
               </form>
               */}
             </div>
-            <Item {...{item}} />
-            <Participants {...{item}} />
+            <div className='item'>
+              <Item {...{item}} />
+              <Participants {...{item}} />
+            </div>
             <List {...{ items, action: `/items/${id}/items`, parent: item }} />
           </li>
         </ul>

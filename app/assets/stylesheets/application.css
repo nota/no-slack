@@ -38,3 +38,9 @@ body {
 .clickable:hover {
   background-color: lightgray;
 }
+
+.item {
+  margin-bottom: 1em;
+  border: gray solid 1px;
+  padding: 2px 0.5em;
+}
