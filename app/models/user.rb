@@ -5,7 +5,7 @@ class User
   validates :name, uniqueness: true, allow_nil: true
 
   before_create do
-    self.name ||= auths.first.email.split('@').first
+    self.name ||= auths.first&.email&.split('@')&.first
   end
 
   class Auth

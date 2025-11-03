@@ -48,32 +48,55 @@ function Item({ item }) {
   );
 }
 
-function Participants({ item }) {
-  return (
-    <span style={{display: 'inline-flex', gap:'0.5em'}}>
+function Participant({ item, participant }) {
+  const { setReload } = useContext(ItemsContext);
+  const [done, setDone] = useState(!participant.actor);
+  const handleChange = () => {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    // console.log({ value: e.target.value, participant_id });
+    fetch(
+      `/items/${item._id}`,
       {
-        item.participants?.map((p) => {
-          return (
-            <span key={p._id}>
-              <input type='checkbox' checked={!p.actor} disabled />
-              {p.user?.name}
-            </span>
-          );
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': token
+        },
+        body: JSON.stringify({
+          item: {
+            participants_attributes: [
+              { _id: participant._id, actor: done }
+            ]
+          }
         })
-      }
+      })
+      .then(res => {
+        if (res.ok) {
+          setDone(!done);
+          setReload(Date.now());
+        }
+      });
+  }
+
+  return (
+    <span>
+      <input type='checkbox' checked={done} onChange={handleChange} />
+      {participant.user?.name}
     </span>
   );
 }
 
-function ListItem({ item }) {
+function Participants({ item }) {
   return (
-    <li key={item._id} className='item'>
-      <Item {...{item}} />
-      <div style={{color: "gray", fontSize: "0.8em"}}>
-        <Link key='comments' to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
-        <Participants {...{item}} />
-      </div>
-    </li>
+    <span style={{display: 'inline-flex', gap:'0.5em'}}>
+      {
+        item.participants?.map((participant) => {
+          return (
+            <Participant key={participant._id} {...{item, participant}} />
+          );
+        })
+      }
+    </span>
   );
 }
 
@@ -235,7 +258,7 @@ function ItemForm({action, parent}) {
     });
     if (response.ok) {
       form.reset();
-      setReload(Date.now())
+      setReload(Date.now());
     } else {
       // TODO: error handling
     }
@@ -261,6 +284,18 @@ function ItemForm({action, parent}) {
         }
       </form>
     </>
+  );
+}
+
+function ListItem({ item }) {
+  return (
+    <li key={item._id} className='item'>
+      <Item {...{item}} />
+      <div style={{color: "gray", fontSize: "0.8em"}}>
+        <Link key='comments' to={`/items/${item._id}`} style={{color: "gray"}}>{item.count_children} comments</Link>
+        <Participants {...{item}} />
+      </div>
+    </li>
   );
 }
 

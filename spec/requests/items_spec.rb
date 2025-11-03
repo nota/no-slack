@@ -81,4 +81,17 @@ RSpec.describe 'Items', type: :request do
       end
     end
   end
+
+  describe 'PATCH /items/:id' do
+    let(:user) { User.create! }
+    let!(:item) { Item.create!(text: 'nope', user:, participants: [{user:, actor: true}]) }
+    let(:participant_id) { item.participants.first.id }
+
+    before do
+      patch "/items/#{item.id}", params: { item: {participants_attributes: [{ _id: participant_id, actor: false }]}}
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+    it { expect(item.reload.participants.find_by(_id: participant_id).actor).to eq(false) }
+  end
 end

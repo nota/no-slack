@@ -68,4 +68,13 @@ class ItemsController < ApplicationController
       format.json { render json: Item.find_by(id: params[:id]).as_json(include: :user) }
     end
   end
+
+  def update
+    item = Item.find_by(id: params[:id])
+    item_params = params.expect(item: [participants_attributes:[[:_id, :actor]]])
+    unless item.update(item_params)
+      item.participants.map(&:errors)
+    end
+    render json: item
+  end
 end

@@ -36,6 +36,7 @@ class Item
     # end
   end
   embeds_many :participants
+  accepts_nested_attributes_for :participants
 
   before_create do
     text.scan(/@(\w+)/).flatten.uniq.each do |name|
