@@ -352,6 +352,29 @@ function LinkToUnlessCurrent({ to, children, ...props }) {
   return <Link to={to} {...props}>{children}</Link>;
 }
 
+function WaitedItems() {
+  const { authUser } = useContext(AuthUserContext);
+  const [items, setItems] = useState([]);
+  const [reload, setReload] = useState(Date.now());
+
+  useEffect(() => {
+    if (authUser) {
+      fetch(`/items.json?waited=${authUser._id}`).then((res) => res.json().then(setItems));
+    }
+  }, [authUser]);
+
+  return (
+    <ItemsContext.Provider value={{reload, setReload}}>
+      Someone waiting for you:
+      <ol>
+        {items?.map((item) => {
+          return <ListItem key={item._id} {...{ item }} />;
+        })}
+      </ol>
+    </ItemsContext.Provider>
+  );
+}
+
 function RootPage({ parent }) {
   // console.log({parent});
   // const fetcher = (url) =>
@@ -378,15 +401,19 @@ function RootPage({ parent }) {
   }, [query, reload]);
 
   return (
-    <ItemsContext.Provider value={{reload, setReload}}>
-      <div style={{display: 'flex', gap: '0.6em'}}>
-        <LinkToUnlessCurrent to='/items'>all</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to='/'>root</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
-      </div>
-      <List {...{ items, action: '/items' }} />
-    </ItemsContext.Provider>
+    <>
+      <WaitedItems />
+      <ItemsContext.Provider value={{reload, setReload}}>
+        <div style={{display: 'flex', gap: '0.6em'}}>
+          <LinkToUnlessCurrent to='/items'>all</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to='/'>root</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to={`/?done=${authUser?._id}`}>done</LinkToUnlessCurrent>
+        </div>
+        <List {...{ items, action: '/items' }} />
+      </ItemsContext.Provider>
+    </>
   );
 }
 

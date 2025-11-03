@@ -21,10 +21,12 @@ class ItemsController < ApplicationController
         elsif params[:waiting]
           # user_id = User.where(name: params[:waiting]).pick(:id)
           user_id = BSON::ObjectId(params[:waiting])
-          @items = @items.where(
-            :participants.elem_match => {:actor.ne => true, user_id:},
-            :participants.elem_match => {actor: true, :user_id.ne => user_id}
-          )
+          @items = @items.where(:participants.elem_match => {:actor.ne => true, user_id:})
+                     .where(:participants.elem_match => {actor: true, :user_id.ne => user_id})
+        elsif params[:waited]
+          user_id = BSON::ObjectId(params[:waited])
+          @items = @items.where(:participants.elem_match => {actor: true, user_id:})
+                     .where(:participants.elem_match => {:user_id.ne => user_id})
         # else #root
         #   @items = @item
         end
