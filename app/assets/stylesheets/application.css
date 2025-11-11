@@ -44,3 +44,8 @@ body {
   border: gray solid 1px;
   padding: 2px 0.5em;
 }
+
+span.list-item {
+  margin-top: 0.5em;
+  margin-right: 1em;
+}

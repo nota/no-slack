@@ -1,5 +1,3 @@
-// import React, { useState } from "react";
-// import React, { Suspense } from "react";
 // import useSWR from "swr";
 import React, { useState, useEffect, useContext, createContext, StrictMode } from "react";
 import {
@@ -352,6 +350,32 @@ function LinkToUnlessCurrent({ to, children, ...props }) {
   return <Link to={to} {...props}>{children}</Link>;
 }
 
+function FromUsers() {
+  const [users, setUsers] = useState([]);
+  const { authUser } = useContext(AuthUserContext);
+  useEffect(() => {
+    if (authUser) {
+      fetch(`/items.json?waited=${authUser._id}`).then(r => r.json()).then((items) => {
+        // Create unique users list
+        const pairs = items.flatMap((item) => {
+          return item.participants
+            .filter(p => p.user._id !== authUser._id)
+            .map((p) => {
+              return [p.user._id, p.user];
+            });
+        });
+        setUsers(Array.from(new Map(pairs).values()))
+      });
+    }
+  },[authUser]);
+  return (
+    <>
+      waited users:
+      { users.map((user) => <LinkToUnlessCurrent to={`/?waiting=${user._id}`} key={user._id}>{user.name}</LinkToUnlessCurrent>) }
+    </>
+  );
+}
+
 function RootPage({ parent }) {
   // console.log({parent});
   // const fetcher = (url) =>
@@ -369,7 +393,7 @@ function RootPage({ parent }) {
     params.set('item_id', parent);
   }
   const query = params.toString();
-  console.log({parent, query});
+  // console.log({parent, query});
 
   const [items, setItems] = useState([]);
   const [reload, setReload] = useState(Date.now());
@@ -379,11 +403,16 @@ function RootPage({ parent }) {
 
   return (
     <ItemsContext.Provider value={{reload, setReload}}>
-      <div style={{display: 'flex', gap: '0.6em'}}>
-        <LinkToUnlessCurrent to='/items'>all</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to='/'>root</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
-        <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
+      <div style={{display: 'flex', flexDirection: 'column', gap: '0.5em'}}>
+        <div style={{display: 'flex', gap: '0.5em'}}>
+          <LinkToUnlessCurrent to='/items'>all</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to='/'>root</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to={`/?actor=${authUser?._id}`}>my items</LinkToUnlessCurrent>
+          <LinkToUnlessCurrent to={`/?waiting=${authUser?._id}`}>waiting</LinkToUnlessCurrent>
+        </div>
+        <div style={{display: 'flex', gap: '0.5em'}}>
+          <FromUsers />
+        </div>
       </div>
       <List {...{ items, action: '/items' }} />
     </ItemsContext.Provider>
